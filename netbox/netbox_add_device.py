@@ -2,14 +2,14 @@ import requests
 import json
 
 token = "Token ..."
-netbox_api = "http://ip-address.com:8000/api"
+NETBOX_API_ROOT = "http://netbox.com:8000/api"
 headers = {
     "Content-Type": "application/json",
     "Accept": "application/json",
     "Authorization": "Token ..."
 }
 
-region_end_point = netbox_api + "/dcim/regions"
+region_end_point = NETBOX_API_ROOT + "/dcim/regions"
 
 table_header = ['id', 'name']
 
@@ -27,7 +27,7 @@ def get_region():
 
 
 def get_sites(arg):
-    sites_endpoint = netbox_api + "/dcim/sites/?region_id={}".format(arg)
+    sites_endpoint = NETBOX_API_ROOT + "/dcim/sites/?region_id={}".format(arg)
     req_sites = requests.get(sites_endpoint, headers=headers)
     req_sites_json = req_sites.json()
 
@@ -41,7 +41,7 @@ def get_sites(arg):
 
 
 def get_vendor():
-    manufacturer_endpoint = netbox_api + "/dcim/manufacturers/"
+    manufacturer_endpoint = NETBOX_API_ROOT + "/dcim/manufacturers/"
     req_man = requests.get(manufacturer_endpoint, headers=headers)
     req_man_json = req_man.json()
     print("-" * 30)
@@ -53,7 +53,7 @@ def get_vendor():
 
 
 def get_type(arg):
-    type_endpoint = netbox_api + "/dcim/device-types/?manufacturer_id={}".format(arg)
+    type_endpoint = NETBOX_API_ROOT + "/dcim/device-types/?manufacturer_id={}".format(arg)
     req_types = requests.get(type_endpoint, headers=headers)
     req_types_json = req_types.json()
     print('-' * 30)
@@ -65,7 +65,7 @@ def get_type(arg):
 
 
 def add_device(model, site, name):
-    device_endpoint = netbox_api + "/dcim/devices/"
+    device_endpoint = NETBOX_API_ROOT + "/dcim/devices/"
     payload = {
         "name": name,
         "device_type": int(model),
@@ -86,7 +86,7 @@ def add_device(model, site, name):
 
 
 def get_devices():
-    get_devices_adnpoint = netbox_api + "/dcim/devices/"
+    get_devices_adnpoint = NETBOX_API_ROOT + "/dcim/devices/"
     req_devices = requests.get(get_devices_adnpoint, headers=headers)
     req_devices_json = req_devices.json()
 
@@ -95,11 +95,11 @@ def get_devices():
 
 
 def get_ipaddress(site):
-    get_prefix_endpoint = netbox_api + "/ipam/prefixes/?site_id={}".format(site)
+    get_prefix_endpoint = NETBOX_API_ROOT + "/ipam/prefixes/?site_id={}".format(site)
     req_get_pref = requests.get(get_prefix_endpoint, headers=headers)
     req_get_pref_json = req_get_pref.json()
     pref_id = req_get_pref_json['results'][0]['id']
-    get_ip_endpoint = netbox_api + "/ipam/prefixes/{}/available-ips/".format(pref_id)
+    get_ip_endpoint = NETBOX_API_ROOT + "/ipam/prefixes/{}/available-ips/".format(pref_id)
     req_ip = requests.post(get_ip_endpoint, headers=headers)
     req_ip_json = req_ip.json()
     ip_addr = req_ip_json['address']
@@ -108,7 +108,7 @@ def get_ipaddress(site):
 
 
 def get_inteface_id(name):
-    end_point = netbox_api + "/dcim/interfaces/?device={}&name=vlan100".format(name)
+    end_point = NETBOX_API_ROOT + "/dcim/interfaces/?device={}&name=vlan100".format(name)
     req_get_int_id = requests.get(end_point, headers=headers)
     req_get_int_id_json = req_get_int_id.json()
 
@@ -117,7 +117,7 @@ def get_inteface_id(name):
 
 def add_ip_address(interface_id, ip_address, name):
     print('adding ip address: {} to device {}'.format(ip_address, name))
-    local_end_point = netbox_api + '/ipam/ip-addresses/'
+    local_end_point = NETBOX_API_ROOT + '/ipam/ip-addresses/'
     local_payload = {
         "address": ip_address,
         "status": "active",
@@ -143,4 +143,3 @@ add_device(model=model, site=site, name=device_name)
 interface_id = get_inteface_id(device_name)
 
 add_ip_address(interface_id, ip_address, name=device_name)
-
