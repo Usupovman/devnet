@@ -1,0 +1,38 @@
+
+/interface bridge
+add name=loopback
+
+
+/interface vlan
+{% for vlan in vlans %}
+add interface={{vlan.parent_int}} name={{vlan.name}} vlan-id={{vlan.id}}
+{% endfor %}
+
+/routing ospf area
+{% for area, name in areas.items() %}
+add area-id={{area}} name={{name}}
+{% endfor %}
+
+/routing ospf instance
+set [ find default=yes ] router-id={{loopback_ip}}
+
+/ip address
+{% for interface in interfaces %}
+add address={{interface.ip_address}} netmask={{interface.netmask}} interface={{interface.name}} 
+{% endfor %}
+
+/ip route
+add distance=1 gateway={{gateway}}
+
+/routing ospf interface
+add authentication=md5 authentication-key={{ospf_key}}
+
+/routing ospf network
+{% for network in ospf %}
+add area={{network.area}} network={{network.network}}
+{% endfor %}
+
+/system identity
+set name={{name}}
+
+
